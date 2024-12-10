@@ -112,12 +112,11 @@ st.markdown("<h1 style='text-align: center; color: blue;'>🧠 Aplikasi Prediksi
 # CSS Kustom untuk memastikan warna teks tetap hitam
 st.markdown("""
     <style>
-    /* Pastikan label input tetap hitam */
     label {
         color: black !important;
         font-weight: bold !important;
     }
-    /* Pastikan teks dalam input box tetap hitam */
+
     input {
         color: black !important;
     }
