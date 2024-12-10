@@ -29,10 +29,6 @@ classifier = pickle.load(open('Klasifikasi.sav', 'rb'))
 regresi_nilai = pickle.load(open('NilaiIQ.sav', 'rb'))
 scaler = pickle.load(open('scaler.sav', 'rb'))
 
-# Sidebar untuk informasi tambahan
-st.sidebar.title("🔍 Tentang Aplikasi")
-st.sidebar.info("Aplikasi ini memprediksi Nilai IQ dan Outcome berdasarkan skor mentah yang diinputkan pengguna. Prediksi dibuat menggunakan model Machine Learning yang terdiri dari **RandomForestClassifier** dan **LinearRegression**.")
-
 # Generate UUID unik untuk perangkat
 if "device_id" not in st.session_state:
     st.session_state["device_id"] = str(uuid.uuid4())
@@ -43,7 +39,7 @@ device_id = st.session_state["device_id"]
 conn = sqlite3.connect('test_data_prediksi_iq.db')
 c = conn.cursor()
 
-# Buat tabel jika belum ada, tambahkan kolom untuk UUID perangkat
+# Buat tabel jika belum ada
 c.execute('''
 CREATE TABLE IF NOT EXISTS prediksi_iq (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,13 +50,17 @@ CREATE TABLE IF NOT EXISTS prediksi_iq (
 )
 ''')
 
+# Fungsi untuk mengambil riwayat dari database
+def get_history(device_id):
+    c.execute('SELECT * FROM prediksi_iq WHERE device_id = ?', (device_id,))
+    return c.fetchall()
+
 # Sidebar untuk riwayat dan hapus data
 st.sidebar.markdown("---")  # Pembatas
 st.sidebar.markdown("## 📑 Riwayat Data")
 with st.sidebar.expander("Lihat Riwayat Prediksi IQ"):
-    # Ambil data dari database berdasarkan UUID perangkat
-    c.execute('SELECT * FROM prediksi_iq WHERE device_id = ?', (device_id,))
-    data = c.fetchall()
+    # Ambil data riwayat dari database
+    data = get_history(device_id)
 
     # Jika ada data, tampilkan dalam dataframe
     if data:
@@ -83,15 +83,7 @@ if st.sidebar.button("🗑️ Hapus Riwayat Data"):
     # Menghapus data hanya untuk UUID perangkat ini
     c.execute('DELETE FROM prediksi_iq WHERE device_id = ?', (device_id,))
     conn.commit()
-    st.rerun()  # Jalankan ulang aplikasi untuk menampilkan pembaruan
-
-# Inisialisasi Session State
-if "prediksi" not in st.session_state:
-    st.session_state["prediksi"] = None
-if "kategori" not in st.session_state:
-    st.session_state["kategori"] = None
-if "nama" not in st.session_state:
-    st.session_state["nama"] = ""
+    st.experimental_rerun()  # Jalankan ulang aplikasi untuk menampilkan pembaruan
 
 # Judul Aplikasi
 st.markdown("<h1 style='text-align: center; color: blue;'>🧠 Aplikasi Prediksi Nilai IQ dan Outcome</h1>", unsafe_allow_html=True)
@@ -100,7 +92,7 @@ st.markdown("<h1 style='text-align: center; color: blue;'>🧠 Aplikasi Prediksi
 st.markdown("<h3 style='text-align: center;'>Masukkan Nama dan Skor Mentah Anda di bawah ini:</h3>", unsafe_allow_html=True)
 
 # Input nama pengguna
-nama = st.text_input("👤 Nama Anda:", value=st.session_state["nama"])
+nama = st.text_input("👤 Nama Anda:")
 
 # Input data pengguna
 input_data = st.number_input("⚖️ Skor Mentah (X):", min_value=0, max_value=100, step=1)
@@ -108,9 +100,6 @@ input_data = st.number_input("⚖️ Skor Mentah (X):", min_value=0, max_value=1
 # Button untuk menghitung hasil
 if st.button("🔍 Hitung Hasil"):
     if nama and input_data:
-        # Simpan nama ke session state
-        st.session_state["nama"] = nama
-
         # Proses input data
         input_data_as_numpy_array = np.array(input_data).reshape(1, -1)
 
@@ -120,7 +109,6 @@ if st.button("🔍 Hitung Hasil"):
         # Prediksi Nilai IQ
         prediksi_iq = regresi_nilai.predict(std_data)
         prediksi_iq = round(prediksi_iq[0])
-        st.session_state["prediksi"] = prediksi_iq
 
         # Prediksi Outcome
         prediction = classifier.predict(std_data)
@@ -130,7 +118,6 @@ if st.button("🔍 Hitung Hasil"):
             kategori = "Rata-rata"
         else:
             kategori = "Di atas rata-rata"
-        st.session_state["kategori"] = kategori
 
         # Menyimpan data ke SQLite
         c.execute('''
@@ -138,22 +125,20 @@ if st.button("🔍 Hitung Hasil"):
             VALUES (?, ?, ?, ?)
         ''', (nama, prediksi_iq, kategori, device_id))
         conn.commit()
-        st.rerun()  # Refresh untuk memperbarui tabel dan UI
+
+        # Menampilkan hasil prediksi
+        st.markdown("---")
+        st.markdown("<h2 style='text-align: center; color: green;'>📊 Hasil Prediksi</h2>", unsafe_allow_html=True)
+        st.success(f"**Hai {nama}**")
+        st.success(f"**Nilai IQ Anda: {prediksi_iq}**")
+        if kategori == "Di bawah rata-rata":
+            st.warning(f"Kategori Anda: **{kategori}**")
+        elif kategori == "Rata-rata":
+            st.info(f"Kategori Anda: **{kategori}**")
+        else:
+            st.success(f"Kategori Anda: **{kategori}**")
     else:
         st.warning("Harap masukkan Nama dan Skor Mentah untuk melihat hasil prediksi.")
-
-# Tampilkan hasil prediksi jika ada di session state
-if st.session_state["prediksi"] is not None and st.session_state["kategori"] is not None:
-    st.markdown("---")
-    st.markdown("<h2 style='text-align: center; color: green;'>📊 Hasil Prediksi</h2>", unsafe_allow_html=True)
-    st.success(f"**Hai {st.session_state['nama']}**")
-    st.success(f"**Nilai IQ Anda: {st.session_state['prediksi']}**")
-    if st.session_state["kategori"] == "Di bawah rata-rata":
-        st.warning(f"Kategori Anda: **{st.session_state['kategori']}**")
-    elif st.session_state["kategori"] == "Rata-rata":
-        st.info(f"Kategori Anda: **{st.session_state['kategori']}**")
-    else:
-        st.success(f"Kategori Anda: **{st.session_state['kategori']}**")
 
 # Tutup koneksi ke SQLite
 conn.close()
