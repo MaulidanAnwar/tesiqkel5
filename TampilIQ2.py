@@ -124,14 +124,15 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Input dari pengguna 
-st.markdown("<h3 style='text-align: center;'>Masukkan Nama dan Skor Mentah Anda di bawah ini:</h3>", unsafe_allow_html=True)
+
+# Judul dan Input Form dengan Warna Hitam
+st.markdown("<h3 style='text-align: center;' class='custom-label'>Masukkan Nama dan Skor Mentah Anda di bawah ini:</h3>", unsafe_allow_html=True)
 
 # Input nama pengguna
-nama = st.text_input("👤 Nama Anda:", value=st.session_state["nama"])
+nama = st.text_input("👤 Nama Anda:", value=st.session_state["nama"], key="nama", label_visibility="visible", label_class="custom-label", container_class="custom-input")
 
 # Input data pengguna
-input_data = st.number_input("⚖️ Skor Mentah (X):", min_value=0, max_value=100, step=1)
+input_data = st.number_input("⚖️ Skor Mentah (X):", min_value=0, max_value=100, step=1, key="skor", label_visibility="visible", label_class="custom-label", container_class="custom-input")
 
 # Button untuk menghitung hasil
 if st.button("🔍 Hitung Hasil"):
