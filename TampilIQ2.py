@@ -109,30 +109,29 @@ if "nama" not in st.session_state:
 # Judul Aplikasi
 st.markdown("<h1 style='text-align: center; color: blue;'>🧠 Aplikasi Prediksi Nilai IQ dan Outcome</h1>", unsafe_allow_html=True)
 
+# CSS Kustom untuk memastikan warna teks tetap hitam
 st.markdown("""
     <style>
-    .custom-label {
+    /* Pastikan label input tetap hitam */
+    label {
         color: black !important;
-        font-weight: bold;
+        font-weight: bold !important;
     }
-    .custom-input input {
-        color: black !important;
-    }
-    .custom-input {
+    /* Pastikan teks dalam input box tetap hitam */
+    input {
         color: black !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-
-# Judul dan Input Form dengan Warna Hitam
-st.markdown("<h3 style='text-align: center;' class='custom-label'>Masukkan Nama dan Skor Mentah Anda di bawah ini:</h3>", unsafe_allow_html=True)
+# Judul Form
+st.markdown("<h3 style='text-align: center; color: black;'>Masukkan Nama dan Skor Mentah Anda di bawah ini:</h3>", unsafe_allow_html=True)
 
 # Input nama pengguna
-nama = st.text_input("👤 Nama Anda:", value=st.session_state["nama"], key="nama", label_visibility="visible", label_class="custom-label", container_class="custom-input")
+nama = st.text_input("👤 Nama Anda:", value=st.session_state["nama"])
 
 # Input data pengguna
-input_data = st.number_input("⚖️ Skor Mentah (X):", min_value=0, max_value=100, step=1, key="skor", label_visibility="visible", label_class="custom-label", container_class="custom-input")
+input_data = st.number_input("⚖️ Skor Mentah (X):", min_value=0, max_value=100, step=1)
 
 # Button untuk menghitung hasil
 if st.button("🔍 Hitung Hasil"):
