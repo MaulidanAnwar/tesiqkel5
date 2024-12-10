@@ -65,10 +65,10 @@ with st.sidebar.expander("Lihat Riwayat Prediksi IQ"):
     # Jika ada data, tampilkan dalam dataframe
     if data:
         df = pd.DataFrame(data, columns=["ID", "Nama", "Nilai IQ", "Kategori", "Device ID"])
-        st.dataframe(df.drop(columns=["ID", "Device ID"]))  # Sembunyikan kolom Device ID dari pengguna
+        st.dataframe(df.drop(columns=["ID", "Device ID"]))
 
         # Download tombol untuk database sebagai CSV
-        csv = df.drop(columns=["Device ID"]).to_csv(index=False)
+        csv = df.drop(columns=["ID", "Device ID"]).to_csv(index=False)
         st.download_button(
             label="📄 Unduh Hasil sebagai CSV",
             data=csv,
