@@ -62,18 +62,31 @@ with st.sidebar.expander("Lihat Riwayat Prediksi IQ"):
     c.execute('SELECT * FROM prediksi_iq WHERE device_id = ?', (device_id,))
     data = c.fetchall()
 
+import io  # Tambahkan import ini untuk BytesIO
+
+# Download tombol untuk database sebagai Excel
+with st.sidebar.expander("Lihat Riwayat Prediksi IQ"):
+    # Ambil data dari database berdasarkan UUID perangkat
+    c.execute('SELECT * FROM prediksi_iq WHERE device_id = ?', (device_id,))
+    data = c.fetchall()
+
     # Jika ada data, tampilkan dalam dataframe
     if data:
         df = pd.DataFrame(data, columns=["ID", "Nama", "Nilai IQ", "Kategori", "Device ID"])
         st.dataframe(df.drop(columns=["ID", "Device ID"]))
 
-        # Download tombol untuk database sebagai CSV
-        csv = df.drop(columns=["ID", "Device ID"]).to_csv(index=False)
+        # Buat file Excel di memory
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.drop(columns=["ID", "Device ID"]).to_excel(writer, index=False, sheet_name="Hasil Prediksi")
+        output.seek(0)  # Reset pointer ke awal file
+
+        # Tombol unduh Excel
         st.download_button(
-            label="📄 Unduh Hasil sebagai CSV",
-            data=csv,
-            file_name="Hasil_Prediksi_IQ.csv",
-            mime="text/csv"
+            label="📄 Unduh Hasil sebagai Excel",
+            data=output,
+            file_name="Hasil_Prediksi_IQ.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
     else:
         st.info("Belum ada riwayat prediksi yang tersimpan untuk perangkat ini.")
