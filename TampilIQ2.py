@@ -109,6 +109,21 @@ if "nama" not in st.session_state:
 # Judul Aplikasi
 st.markdown("<h1 style='text-align: center; color: blue;'>🧠 Aplikasi Prediksi Nilai IQ dan Outcome</h1>", unsafe_allow_html=True)
 
+st.markdown("""
+    <style>
+    .custom-label {
+        color: black !important;
+        font-weight: bold;
+    }
+    .custom-input input {
+        color: black !important;
+    }
+    .custom-input {
+        color: black !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 # Input dari pengguna 
 st.markdown("<h3 style='text-align: center;'>Masukkan Nama dan Skor Mentah Anda di bawah ini:</h3>", unsafe_allow_html=True)
 
