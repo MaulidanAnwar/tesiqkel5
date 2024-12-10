@@ -46,6 +46,7 @@ c = conn.cursor()
 # Buat tabel jika belum ada, tambahkan kolom untuk UUID perangkat
 c.execute('''
 CREATE TABLE IF NOT EXISTS prediksi_iq (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     nama TEXT,
     nilai_iq INTEGER,
     kategori TEXT,
@@ -63,8 +64,8 @@ with st.sidebar.expander("Lihat Riwayat Prediksi IQ"):
 
     # Jika ada data, tampilkan dalam dataframe
     if data:
-        df = pd.DataFrame(data, columns=["Nama", "Nilai IQ", "Kategori", "Device ID"])
-        st.dataframe(df.drop(columns=["Device ID"]))  # Sembunyikan kolom Device ID dari pengguna
+        df = pd.DataFrame(data, columns=["ID", "Nama", "Nilai IQ", "Kategori", "Device ID"])
+        st.dataframe(df.drop(columns=["ID", "Device ID"]))  # Sembunyikan kolom Device ID dari pengguna
 
         # Download tombol untuk database sebagai CSV
         csv = df.drop(columns=["Device ID"]).to_csv(index=False)
