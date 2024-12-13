@@ -19,6 +19,30 @@ st.markdown(
         background-repeat: no-repeat;
         background-attachment: fixed;
     }}
+    .stAlert > div {{
+        background-color: #28a745 !important;  /* Warna hijau */
+        color: white !important;  /* Warna font putih */
+        border-radius: 8px !important;
+        padding: 20px !important;
+    }}
+    .stSuccess > div {{
+        background-color: #28a745 !important;  /* Warna hijau */
+        color: white !important;  /* Warna font putih */
+        border-radius: 8px !important;
+        padding: 20px !important;
+    }}
+    .stWarning > div {{
+        background-color: #28a745 !important;  /* Warna hijau */
+        color: white !important;  /* Warna font putih */
+        border-radius: 8px !important;
+        padding: 20px !important;
+    }}
+    .stInfo > div {{
+        background-color: #28a745 !important;  /* Warna hijau */
+        color: white !important;  /* Warna font putih */
+        border-radius: 8px !important;
+        padding: 20px !important;
+    }}
     </style>
     """,
     unsafe_allow_html=True
@@ -109,20 +133,6 @@ if "nama" not in st.session_state:
 # Judul Aplikasi
 st.markdown("<h1 style='text-align: center; color: blue;'>🧠 Aplikasi Prediksi Nilai IQ dan Outcome</h1>", unsafe_allow_html=True)
 
-# CSS Kustom untuk memastikan warna teks tetap hitam
-st.markdown("""
-    <style>
-    label {
-        color: black !important;
-        font-weight: bold !important;
-    }
-
-    input {
-        color: black !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
 # Judul Form
 st.markdown("<h3 style='text-align: center; color: black;'>Masukkan Nama dan Skor Mentah Anda di bawah ini:</h3>", unsafe_allow_html=True)
 
@@ -130,7 +140,7 @@ st.markdown("<h3 style='text-align: center; color: black;'>Masukkan Nama dan Sko
 nama = st.text_input("👤 Nama Anda:", value=st.session_state["nama"])
 
 # Input data pengguna
-input_data = st.number_input("⚖️ Skor Mentah (X):", min_value=0, max_value=100, step=1)
+input_data = st.number_input("⚖️ Skor Mentah (X):", min_value=0, max_value=100, step=1, value=st.session_state.get("input_data", 0))
 
 # Button untuk menghitung hasil
 if st.button("🔍 Hitung Hasil"):
@@ -181,6 +191,16 @@ if st.session_state["prediksi"] is not None and st.session_state["kategori"] is 
         st.info(f"Kategori Anda: **{st.session_state['kategori']}**")
     else:
         st.success(f"Kategori Anda: **{st.session_state['kategori']}**")
+
+    # Tombol Clear untuk menghapus semua inputan (kecuali riwayat)
+    clear_button = st.button("🧹 Clear Inputan")
+    if clear_button:
+        # Reset session state untuk inputs dan prediksi, tapi tidak untuk riwayat
+        st.session_state["nama"] = ""
+        st.session_state["prediksi"] = None
+        st.session_state["kategori"] = None
+        st.session_state["input_data"] = None  # Reset skor mentah
+        st.rerun()  # Refresh untuk memperbarui tampilan aplikasi
 
 # Tutup koneksi ke SQLite
 conn.close()
